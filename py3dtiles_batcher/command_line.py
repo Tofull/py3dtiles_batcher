@@ -18,6 +18,7 @@ def command_line():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         epilog='''Working example (remove --dryrun when you want to generate tiles) : py3dtiles_batcher.exe "D:\\data_py3dtiles\\output" "D:\\data_py3dtiles\\raw" --dryrun -v''')
     parser.add_argument('--dryrun', help="Active dryrun mode. No tile will be generated in this mode.", action='store_true')
+    parser.add_argument('--incremental', help="Active incremental mode. Skip tile if <output_folder>/<tile>/tileset.json exists.", action='store_true')
     parser.add_argument('--srs_in', help="Srs in.", type=int, default=2959)
     parser.add_argument('--srs_out', help="Srs out.", type=int, default=4978)
     parser.add_argument('--cache_size', help="Cache size in MB.", type=int, default=3135)
@@ -32,8 +33,8 @@ def command_line():
     parse_args(**vars(args))
 
 
-def parse_args(dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, output_folder=None, input_folder=None, **kwargs):
-    main(input_folder, output_folder, dryrun=dryrun, srs_in=srs_in, srs_out=srs_out, cache_size=cache_size, docker_image=docker_image, verbose=verbose, **kwargs)
+def parse_args(dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, output_folder=None, input_folder=None, incremental=None, **kwargs):
+    main(input_folder, output_folder, dryrun=dryrun, srs_in=srs_in, srs_out=srs_out, cache_size=cache_size, docker_image=docker_image, verbose=verbose, incremental=incremental, **kwargs)
 
 
 def get_las(folder_to_watch):
@@ -50,7 +51,7 @@ def get_las(folder_to_watch):
     return iterators
 
 
-def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, **kwargs):
+def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, incremental=None, **kwargs):
 
     liste_las_to_process_iterator = set(get_las(input_folder))
     detected_files = len(liste_las_to_process_iterator)
@@ -90,12 +91,21 @@ def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, ca
             cache_size,
             basename)
 
+        must_be_processed = True
+        if incremental:
+            if os.path.isfile(os.path.join(folder_tiles_path, name_base64, 'tileset.json')):
+                must_be_processed = False
+
         if dryrun:
             print("DryRun : \n{}\n".format(commandline))
-            print("Nothing to do in dryRun mode")
+            print("Nothing to do in dryRun mode{}".format(" (This file will be skipped because of incremental mode)." if not must_be_processed else '.'))
             print("Done")
             pass
         else:
+            if not must_be_processed:
+                if verbose > 0:
+                    print("Skipped because of incremental mode. File {} already exists".format(os.path.join(folder_tiles_path, name_base64, 'tileset.json')))
+                continue
             if verbose > 0:
                 print("Executing : \n{}\n".format(commandline))
             args = shlex.split(commandline)
