@@ -56,10 +56,10 @@ def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, ca
     liste_las_to_process_iterator = set(get_las(input_folder))
     detected_files = len(liste_las_to_process_iterator)
 
-    folder_tiles_path = pathlib.PurePath(output_folder).as_posix()
+    folder_tiles_path = pathlib.PurePath(os.path.abspath(output_folder)).as_posix()
 
     for index, filename in enumerate(liste_las_to_process_iterator):
-        path = pathlib.PurePath(os.path.dirname(filename)).as_posix()
+        path = pathlib.PurePath(os.path.abspath(os.path.dirname(filename))).as_posix()
         basename = os.path.basename(filename)
         name, extension = os.path.splitext(basename)
         name_base64 = base64.b64encode(name.encode()).decode('utf-8')
