@@ -39,29 +39,26 @@ Usage
 
     .. code-block:: shell
 
-        usage: py3dtiles_batcher [-h] [--dryrun] [--srs_in SRS_IN] [--srs_out SRS_OUT]
-                                [--cache_size CACHE_SIZE]
-                                [--docker_image DOCKER_IMAGE] [--verbose]
-                                output_folder [input_folder [input_folder ...]]
+        usage: py3dtiles_batcher [-h] [--dryrun] [--incremental] [--srs_in SRS_IN]
+                         [--srs_out SRS_OUT] [--cache_size CACHE_SIZE]
+                         [--docker_image DOCKER_IMAGE] [--verbose]
+                         output_folder [input_folder [input_folder ...]]
 
         Convert .las file to 3dtiles in batch.
 
         positional arguments:
-            output_folder         Directory to save tiles.
-            input_folder          Directory to watch. (default: .)
+        output_folder         Directory to save tiles.
+        input_folder          Directory to watch. (default: .)
 
         optional arguments:
-            -h, --help            show this help message and exit
-            --dryrun              Active dryrun mode. No tile will be generated in this
-                                    mode. (default: False)
-            --srs_in SRS_IN       Srs in. (default: 2959)
-            --srs_out SRS_OUT     Srs out. (default: 4978)
-            --cache_size CACHE_SIZE
-                                    Cache size in MB. (default: 3135)
-            --docker_image DOCKER_IMAGE
-                                    py3dtiles docker image to use. (default: py3dtiles)
-            --verbose, -v         Verbosity (-v simple info, -vv more info, -vvv spawn
-                                    info) (default: 0)
+            -h, --help                  show this help message and exit
+            --dryrun                    Active dryrun mode. No tile will be generated in this mode. (default: False)
+            --incremental               Active incremental mode. Skip tile if <output_folder>/<tile>/tileset.json exists. (default: False)
+            --srs_in SRS_IN             Srs in. (default: 2959)
+            --srs_out SRS_OUT           Srs out. (default: 4978)
+            --cache_size CACHE_SIZE     Cache size in MB. (default: 3135)
+            --docker_image DOCKER_IMAGE py3dtiles docker image to use. (default: py3dtiles)
+            --verbose, -v               Verbosity (-v simple info, -vv more info, -vvv spawn info) (default: 0)
 
         Working example (remove --dryrun when you want to generate tiles) :
         py3dtiles_batcher.exe "D:\data_py3dtiles\output" "D:\data_py3dtiles\raw" --dryrun -v
