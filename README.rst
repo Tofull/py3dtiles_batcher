@@ -19,7 +19,6 @@ This project needs a docker image of py3dtiles. Please follow the instructions :
 
         $ git clone https://github.com/Tofull/py3dtiles
         $ cd py3dtiles
-        $ git fetch && git checkout lasTo3dtiles  # Required until the PR is merged
         $ docker build -t py3dtiles .
 
 Installation
@@ -29,9 +28,10 @@ Installation
 
     .. code-block:: shell
 
-        git clone https://github.com/Tofull/py3dtiles_batcher
-        cd py3dtiles_batcher
-        pip install .
+        $ git clone https://github.com/Tofull/py3dtiles_batcher
+        $ cd py3dtiles_batcher
+        $ git fetch && git checkout support_new_py3dtiles_cli
+        $ pip install .
 
 
 Usage
@@ -41,7 +41,7 @@ Usage
 
         usage: py3dtiles_batcher [-h] [--dryrun] [--incremental] [--srs_in SRS_IN]
                          [--srs_out SRS_OUT] [--cache_size CACHE_SIZE]
-                         [--docker_image DOCKER_IMAGE] [--verbose]
+                         [--docker_image DOCKER_IMAGE] [--verbose] [--norgb]
                          output_folder [input_folder [input_folder ...]]
 
         Convert .las file to 3dtiles in batch.
@@ -51,14 +51,21 @@ Usage
         input_folder          Directory to watch. (default: .)
 
         optional arguments:
-            -h, --help                  show this help message and exit
-            --dryrun                    Active dryrun mode. No tile will be generated in this mode. (default: False)
-            --incremental               Active incremental mode. Skip tile if <output_folder>/<tile>/tileset.json exists. (default: False)
-            --srs_in SRS_IN             Srs in. (default: 2959)
-            --srs_out SRS_OUT           Srs out. (default: 4978)
-            --cache_size CACHE_SIZE     Cache size in MB. (default: 3135)
-            --docker_image DOCKER_IMAGE py3dtiles docker image to use. (default: py3dtiles)
-            --verbose, -v               Verbosity (-v simple info, -vv more info, -vvv spawn info) (default: 0)
+            -h, --help            show this help message and exit
+            --dryrun              Active dryrun mode. No tile will be generated in this
+                                    mode. (default: False)
+            --incremental         Active incremental mode. Skip tile if
+                                    <output_folder>/<tile>/tileset.json exists. (default:
+                                    False)
+            --srs_in SRS_IN       Srs in. (default: 2959)
+            --srs_out SRS_OUT     Srs out. (default: 4978)
+            --cache_size CACHE_SIZE
+                                    Cache size in MB. (default: 3135)
+            --docker_image DOCKER_IMAGE
+                                    py3dtiles docker image to use. (default: py3dtiles)
+            --verbose, -v         Verbosity (-v simple info, -vv more info, -vvv spawn
+                                    info) (default: 0)
+            --norgb               Do not export rgb attributes (default: True)
 
         Working example (remove --dryrun when you want to generate tiles) :
         py3dtiles_batcher.exe "D:\data_py3dtiles\output" "D:\data_py3dtiles\raw" --dryrun -v
@@ -87,7 +94,7 @@ You can select specific files or folder you want to convert:
 Notes :
 #############
 
-- Think to specify the `srs_in` option if its differs from EPSG:2959
+- Remember to specify the `srs_in` option if its differs from EPSG:2959
 
 - output path will be written in base64 encodage, to respect URL’s standard (which will be useful for 3d webviewer [Read What's next section]). Don't be surprised.
 
@@ -127,8 +134,10 @@ What's next ?
 
 * Visualize merged 3dtiles
 
-    If you want to visualize all your 3dtiles at the same time, some steps are required to merge them into one tileset.json.
+    If you want to visualize all your 3dtiles at the same time, some steps are required to merge them into one big tileset.json.
     Hopefully, I created the merger tool. Please refer to it by clicking on the following link : https://github.com/Tofull/py3dtiles_merger
+
+    After some discussion with Oslandia' developers team, they have released a new version of py3dtiles with a "merge" command which is intended to do a better stuff than py3dtiles_merger. The previous command "py3dtiles" (renamed as "py3dtiles convert") - used to generate the individual 3dtiles - needed some changes (a well-done hierarchical 3d points structure from children, reconsidering a true computation of the geometricError attribute).
 
 Contribution
 #############
