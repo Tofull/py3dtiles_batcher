@@ -30,7 +30,6 @@ Installation
 
         $ git clone https://github.com/Tofull/py3dtiles_batcher
         $ cd py3dtiles_batcher
-        $ git fetch && git checkout feature/support_new_py3dtiles_cli
         $ pip install .
 
 
