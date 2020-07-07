@@ -24,6 +24,7 @@ def command_line():
     parser.add_argument('--cache_size', help="Cache size in MB.", type=int, default=3135)
     parser.add_argument('--docker_image', help="py3dtiles docker image to use.", type=str, default="py3dtiles")
     parser.add_argument('--verbose', '-v', action='count', help="Verbosity (-v simple info, -vv more info, -vvv spawn info)", default=0)
+    parser.add_argument('--norgb', dest="rgb", action='store_false', help="Do not export rgb attributes")
     parser.add_argument('output_folder', help='Directory to save tiles.')
     parser.add_argument('input_folder', nargs="*", default=".", help='Directory to watch.')
     args = parser.parse_args()
@@ -33,8 +34,8 @@ def command_line():
     parse_args(**vars(args))
 
 
-def parse_args(dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, output_folder=None, input_folder=None, incremental=None, **kwargs):
-    main(input_folder, output_folder, dryrun=dryrun, srs_in=srs_in, srs_out=srs_out, cache_size=cache_size, docker_image=docker_image, verbose=verbose, incremental=incremental, **kwargs)
+def parse_args(dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, output_folder=None, input_folder=None, incremental=None, rgb=None, **kwargs):
+    main(input_folder, output_folder, dryrun=dryrun, srs_in=srs_in, srs_out=srs_out, cache_size=cache_size, docker_image=docker_image, verbose=verbose, incremental=incremental, rgb=rgb, **kwargs)
 
 
 def get_las(folder_to_watch):
@@ -51,7 +52,7 @@ def get_las(folder_to_watch):
     return iterators
 
 
-def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, incremental=None, **kwargs):
+def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, cache_size=None, docker_image=None, verbose=None, incremental=None, rgb=None, **kwargs):
 
     liste_las_to_process_iterator = set(get_las(input_folder))
     detected_files = len(liste_las_to_process_iterator)
@@ -73,15 +74,17 @@ def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, ca
                 \n\t name : {}\
                 \n\t name (base64): {}\
                 \n\t extension : {}\
+                \n\t rgb : {}\
                 \n".format(
                 filename,
                 path,
                 basename,
                 name,
                 name_base64,
-                extension))
+                extension,
+                rgb))
 
-        commandline = 'docker run --init --rm -v {}:/data_in -v {}:/data_out {} py3dtiles --overwrite True --srs_in {} --srs_out {} --out /data_out/{} --cache_size {} \"/data_in/{}\"'.format(
+        commandline = 'docker run --init --rm -v {}:/data_in -v {}:/data_out {} py3dtiles convert --overwrite True --srs_in {} --srs_out {} --out \"/data_out/{}\" --cache_size {} \"/data_in/{}\" --rgb {}'.format(
             path,
             folder_tiles_path,
             docker_image,
@@ -89,7 +92,8 @@ def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, ca
             srs_out,
             name_base64,
             cache_size,
-            basename)
+            basename,
+            rgb)
 
         must_be_processed = True
         if incremental:
