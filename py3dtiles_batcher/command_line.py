@@ -81,7 +81,7 @@ def main(input_folder, output_folder, dryrun=None, srs_in=None, srs_out=None, ca
                 name_base64,
                 extension))
 
-        commandline = 'docker run --rm -v {}:/data_in -v {}:/data_out {} py3dtiles --overwrite True --srs_in {} --srs_out {} --out /data_out/{} --cache_size {} \"/data_in/{}\"'.format(
+        commandline = 'docker run --init --rm -v {}:/data_in -v {}:/data_out {} py3dtiles --overwrite True --srs_in {} --srs_out {} --out /data_out/{} --cache_size {} \"/data_in/{}\"'.format(
             path,
             folder_tiles_path,
             docker_image,
