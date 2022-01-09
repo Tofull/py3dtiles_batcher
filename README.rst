@@ -19,6 +19,7 @@ This project needs a docker image of py3dtiles. Please follow the instructions :
 
         $ git clone https://github.com/Tofull/py3dtiles
         $ cd py3dtiles
+        $ git checkout feature/Docker_support
         $ docker build -t py3dtiles .
 
 Installation
